@@ -32,7 +32,7 @@ const createUserTable = () => {
 };
 
 const createChatRoom = () => {
-    const sqlquery = 'CREATE TABLE IF NOT EXISTS tb_chatroom (id UUID PRIMARY KEY,user_ids TEXT [],jenis VARCHAR(100) NOT NULL,chat_initiator VARCHAR(100) NOT NULL, created_at TIMESTAMP,updated_at TIMESTAMP)';
+    const sqlquery = 'CREATE TABLE IF NOT EXISTS tb_chatroom (id UUID PRIMARY KEY,user_ids VARCHAR(100) [],jenis VARCHAR(100) NOT NULL,chat_initiator VARCHAR(100) NOT NULL REFERENCES tb_users(id) ON DELETE NOßACTION, created_at TIMESTAMP,updated_at TIMESTAMP)';
     pool.query(sqlquery)
     .then((res)=>{
         console.log(res);
@@ -68,4 +68,7 @@ pool.on('remove', ()=>{
     process.exit(0);
 });
 
+if (process.argv[2] === "createAllTable") {
+    createAllTable();
+  }
 export default createAllTable;
