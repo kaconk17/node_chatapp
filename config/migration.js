@@ -1,4 +1,4 @@
-import pool from './connection.js';
+const { pool } = require("../config/connection");
 
 console.log('Starting...');
 pool.on('connect', ()=>{
@@ -71,4 +71,6 @@ pool.on('remove', ()=>{
 if (process.argv[2] === "createAllTable") {
     createAllTable();
   }
-export default createAllTable;
+module.exports = {
+    createAllTable,
+}

@@ -1,14 +1,14 @@
-import express from 'express';
+const express = require ('express');
 // controllers
-import chatRoom from '../controllers/chatroom.js';
+const {initiate, postMessage,getRecentConversation,getConversationByRoomId, markConversationReadByRoomId} = require("../controllers/chatroom");
 
 const router = express.Router();
 
 router
-  .get('/', chatRoom.getRecentConversation)
-  .get('/:roomId', chatRoom.getConversationByRoomId)
-  .post('/initiate', chatRoom.initiate)
-  .post('/:roomId/message', chatRoom.postMessage)
-  .put('/:roomId/mark-read', chatRoom.markConversationReadByRoomId)
+  .get('/', getRecentConversation)
+  .get('/:roomId', getConversationByRoomId)
+  .post('/initiate', initiate)
+  .post('/:roomId/message', postMessage)
+  .put('/:roomId/mark-read', markConversationReadByRoomId)
 
-export default router;
+module.exports = router;
