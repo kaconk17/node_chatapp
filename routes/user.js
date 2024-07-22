@@ -1,13 +1,13 @@
 const express = require("express");
 // controllers
-const {onGetAllUsers, onCreateUser,onGetUserById,onDeleteUserById} = require("../controllers/user");
+const {createUser, signinUser, getUser, getAllUser,} = require("../controllers/user");
 
 const router = express.Router();
 
 router
-  .get('/', onGetAllUsers)
-  .post('/', onCreateUser)
-  .get('/:id', onGetUserById)
+  .get('/', getAllUser)
+  .post('/', createUser)
+  .get('/:id', getUser)
   .delete('/:id', onDeleteUserById)
 
 module.exports = router;
