@@ -70,9 +70,15 @@
             //         });
             //     },
             // });
+            var token = localStorage.getItem("chat_token");
+
+            if (!token) {
+                window.location.href = "/login";
+            }
             const socket = io({
+                //autoConnect: false,
                 extraHeaders: {
-                    authorization: `bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInVzZXJfaWQiOiJhZWEwNmY3OC01NmFlLTQzYjEtYTRmMy00MzI3NmJjY2Y0N2IiLCJpYXQiOjE3MjE2NTAwMjQsImV4cCI6MTcyMTkwOTIyNH0.f2RQ8vm4-UwAN5C7jC7qOgX4Y8idAhyZwEvwY3nZBVg`,
+                    authorization: `bearer ${token}`,
                 },
             });
             var form = document.getElementById("form");
@@ -84,6 +90,10 @@
                     socket.emit("chat", input.value);
                     input.value = "";
                 }
+            });
+
+            socket.on("users", (users) => {
+                console.log(users);
             });
         </script>
     </body>

@@ -23,6 +23,9 @@ app.use("/", userRoute);
 app.get("/", (req, res) => {
   res.sendFile(join(__dirname, "chat.html"));
 });
+app.get("/login", (req, res) => {
+  res.sendFile(join(__dirname, "login.html"));
+});
 io.engine.use((req, res, next) => {
   const isHandshake = req._query.sid === undefined;
   if (!isHandshake) {
@@ -56,12 +59,43 @@ io.engine.use((req, res, next) => {
 });
 io.on("connection", async (socket) => {
   //const useremail = socket.request.user.email;
-  console.log(socket.request.user.email);
+
+  socket.join(socket.request.user.user_id);
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID: socket.request.user.user_id,
+      usermail: socket.request.user.email,
+    });
+  }
+  socket.emit("users", users);
   socket.on("chat", (msg) => {
     console.log("Message: " + msg);
   });
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on("disconnect", async () => {
+    const matchingSockets = await io
+      .in(`user:${socket.request.user.user_id}`)
+      .fetchSockets();
+    const isDisconnected = matchingSockets.length === 0;
+    if (isDisconnected) {
+      // notify other users
+      socket.broadcast.emit("user disconnected", socket.request.user.user_id);
+      // update the connection status of the session
+      // sessionStore.saveSession(socket.sessionID, {
+      //   userID: socket.userID,
+      //   username: socket.username,
+      //   connected: false,
+      // });
+      console.log(`user disconnected ${socket.request.user.user_id}`);
+      const users = [];
+      for (let [id, socket] of io.of("/").sockets) {
+        users.push({
+          userID: socket.request.user.user_id,
+          usermail: socket.request.user.email,
+        });
+      }
+      socket.emit("users", users);
+    }
   });
 });
 
