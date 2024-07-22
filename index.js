@@ -20,19 +20,37 @@ app.use("/static", express.static(join(__dirname, "public")));
 app.get("/", (req, res) => {
   res.sendFile(join(__dirname, "chat.html"));
 });
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
-  if (!token) {
-    console.log("Invalid token!");
+io.engine.use((req, res, next) => {
+ 
+  const isHandshake = req._query.sid === undefined;
+  if (!isHandshake) {
+    return next();
+  }
+  const header = req.headers["authorization"];
+
+  if (!header) {
+    return next(new Error("no token"));
+  }
+
+  if (!header.startsWith("bearer ")) {
     return next(new Error("invalid token"));
   }
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET);
-    req.user = decoded.data;
-    next();
-  } catch (error) {
-    return next(new Error("invalid token"));
-  }
+
+  const token = header.substring(7);
+  console.log(token);
+  next();
+  // if (!token) {
+  //   console.log("Invalid token!");
+  //   return next(new Error("invalid token"));
+  // }
+  // try {
+  //   const decoded = jwt.verify(token, process.env.SECRET);
+  //   req.user = decoded.data;
+  //   next();
+  // } catch (error) {
+  //   console.log("tokensalah");
+  //   return next(new Error("invalid token"));
+  // }
   // jwt.verify(token, process.env.SECRET, (err, decoded) => {
   //   if (err) {
   //     return next(new Error("invalid token"));
@@ -40,7 +58,7 @@ io.use((socket, next) => {
   //   req.user = decoded.data;
   //   next();
   // });
-  console.log(token);
+  //console.log(token);
   //next();
 });
 io.on("connection", async (Socket) => {

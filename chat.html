@@ -63,14 +63,18 @@
 
         <script src="/socket.io/socket.io.js"></script>
         <script>
-            var socket = io({
-                auth: (cb) => {
-                    cb({
-                        //token: "abc",
-                    });
-                },
-            });
-
+            // var socket = io({
+            //     auth: (cb) => {
+            //         cb({
+            //             token: "abc",
+            //         });
+            //     },
+            // });
+            const socket = io({
+                extraHeaders: {
+                    authorization: `bearer ABCD`
+                }
+                });
             var form = document.getElementById("form");
             var input = document.getElementById("input");
 
