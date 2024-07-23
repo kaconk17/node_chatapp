@@ -56,6 +56,7 @@
         </style>
     </head>
     <body>
+        <input id="to" />
         <ul id="messages"></ul>
         <form id="form" action="">
             <input id="input" autocomplete="off" /><button>Send</button>
@@ -83,17 +84,22 @@
             });
             var form = document.getElementById("form");
             var input = document.getElementById("input");
+            var to1 = document.getElementById("to");
 
             form.addEventListener("submit", function (e) {
                 e.preventDefault();
                 if (input.value) {
-                    socket.emit("chat", input.value);
+                    var msg = input.value;
+                    socket.emit("private message", {
+                        content: msg,
+                        to: to1.value,
+                    });
                     input.value = "";
                 }
             });
 
-            socket.on("users", (users) => {
-                console.log(users);
+            socket.on("private message", ({ content, from, to }) => {
+                console.log(content);
             });
         </script>
     </body>

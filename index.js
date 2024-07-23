@@ -9,9 +9,10 @@ const io = new Server(server);
 const port = 3000;
 const jwt = require("jsonwebtoken");
 const userRoute = require("./routes/user");
+const cors = require("cors");
 
 require("dotenv").config();
-
+app.use(cors());
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
@@ -72,6 +73,18 @@ io.on("connection", async (socket) => {
   socket.on("chat", (msg) => {
     console.log("Message: " + msg);
   });
+  socket.on("private message", ({ content, to }) => {
+    const message = {
+      content,
+      from: socket.request.user.user_id,
+      to,
+    };
+    socket
+      .to(to)
+      .to(socket.request.user.user_id)
+      .emit("private message", message);
+    //messageStore.saveMessage(message);
+  });
   socket.on("disconnect", async () => {
     const matchingSockets = await io
       .in(`user:${socket.request.user.user_id}`)
@@ -87,14 +100,14 @@ io.on("connection", async (socket) => {
       //   connected: false,
       // });
       console.log(`user disconnected ${socket.request.user.user_id}`);
-      const users = [];
-      for (let [id, socket] of io.of("/").sockets) {
-        users.push({
-          userID: socket.request.user.user_id,
-          usermail: socket.request.user.email,
-        });
-      }
-      socket.emit("users", users);
+      // const users = [];
+      // for (let [id, socket] of io.of("/").sockets) {
+      //   users.push({
+      //     userID: socket.request.user.user_id,
+      //     usermail: socket.request.user.email,
+      //   });
+      // }
+      // socket.emit("users", users);
     }
   });
 });
